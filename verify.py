@@ -63,6 +63,8 @@ def verifica(risp, istruzioni,lab):
         verify_field_existence(istruzioni["necessary_input_fields"]["cloze"].values(), risp.keys())
     elif risp[lab["question_type"]] == "mcq":
         verify_field_existence(istruzioni["necessary_input_fields"]["mcq"].values(), risp.keys())
+    else:
+        error_message(f"Il tipo di domanda deve essere 'dd', 'cloze' o 'mcq'")
     num_aff = int(risp[lab["number_of_statements"]])
     # verify that risp[lab["statements"]] is a dictionary and that it has all keys in the range 1-num_max
     if not isinstance(risp[lab["statements"]],dict):

@@ -22,12 +22,13 @@ def parse_args():
         prog='q_gen',
         description='genera domande in formato Moodle XML da file JSON in input')
 
-    parser.add_argument("-i", "--input", help="file in input", type=str)
-    parser.add_argument("-d", "--directory", help="elaborare tutti i file nella directory in input (se non viene specificata la directory, viene usata quella di default)",
-                        type=str, nargs='?', const = '-')
-    parser.add_argument("-o", "--outdir", help="output directory", type=str)
-    parser.add_argument("-c", "--concat", help="concatena i file specificati nella cartella specificata o nel file config", type=str)
-    return parser.parse_args(), parser
+    parser.add_argument("-i", "--input_file", help="file in input", type=str)
+    parser.add_argument("-s", "--source_directory", help="elaborare tutti i file nella cartella source_directory",
+                        type=str)
+    parser.add_argument("-o", "--out_dir", help="output directory", type=str)
+    parser.add_argument("-j", "--join_dir", help="concatena i file specificati nella cartella join_directory", type=str)
+    parser.add_argument("-c", "--config_file", help="usa config_file come file di configurazione (default config.json); config_file deve essere in formato JSON", type=str)
+    return parser.parse_args()
 
 def forallfiles(input_directory,complete_quiz, extension):
     allfiles = []
@@ -81,12 +82,21 @@ def main():
     print("*******     generazione di domande per Moodle     **********")
     print("************************************************************")
     print("\n")
-    file_config = FILE_CONFIG
-    if not os.path.exists(file_config):
-        error_message(f"Errore! Non esiste il file {file_config}")
 
-    cfg = controlla_json_friendly(file_config)
-    with open(file_config, 'r') as file_db:
+    args = parse_args()
+
+    config_file = FILE_CONFIG
+    if not args.config_file is None:
+        config_file = args.config_file
+    if not os.path.exists(config_file):
+        error_message(f"Errore! Non esiste il file {config_file}")
+    elif not Path.is_file(config_file):
+        error_message(f"Errore! {config_file} non è un file: dopo l'opzione -c, specificare un file JSON")
+
+
+    print("File di configurazione:",config_file)
+    cfg = controlla_json_friendly(config_file)
+    with open(config_file, 'r') as file_db:
         cfg = json.load(file_db)
 
     nomifile = cfg["filenames"]
@@ -96,14 +106,14 @@ def main():
             template_files[key] = os.path.join(cfg["templates"]["template_dir"],cfg["templates"][key]+".xml")
     nomifile.update(template_files)
 
-    if len(sys.argv) > 1 and not parse_args()[0].concat is None:
-        tbc_dir = parse_args()[0].concat
+    if not args.join_dir is None:
+        tbc_dir = args.join_dir
         warning_message(f"È stata richiesta la concatenazione dei file nella cartella {tbc_dir}\n")
         if not os.path.exists(tbc_dir):
             error_message(f"Errore! Non esiste la cartella {tbc_dir}")
+        elif not Path.is_dir(tbc_dir):
+            error_message(f"Errore! {tbc_dir} non è una cartella: dopo l'opzione -j, specificare una cartella")
         concatena(cfg, tbc_dir, nomifile)
-
-        error_message(f"Nel file di configurazione {file_config} non sono specificati file da concatenare")
 
     verify_template_existence(template_files)
 
@@ -117,20 +127,21 @@ def main():
     input_directory = ""
     all = False
 
-    if len(sys.argv) > 1:
-        args, parser = parse_args()
-        if not args.outdir is None:
-            nomifile["out_dir"] = args.outdir
-        if not args.input is None:
-            daeseguire = [args.input]
-        elif not args.directory is None:
-            all = True
-            if not args.directory == '-':
-                input_directory = args.directory
-        else:
-            print("Sulla linea di comando nessuna indicazione sui file da elaborare")
-    elif not cfg["exec"]:
-        print("Nel file di configurazione nessuna indicazione sui file da elaborare")
+    if not args.out_dir is None:
+        if Path.exists(args.out_dir) and not Path.is_dir(args.out_dir):
+            error_message(f"Errore! {args.out_dir} è un file: dopo l'opzione -o, specificare una cartella")
+        nomifile["out_dir"] = args.out_dir
+    if not args.input_file is None:
+        if not Path.exists(args.input_file):
+            error_message(f"Errore! Il file {args.input_file} non esiste")
+        elif not Path.is_file(args.input_file):
+            error_message(f"Errore! {args.input_file} non è un file: dopo l'opzione -i specificare il nome di un file")
+        daeseguire = [args.input_file]
+
+    elif not args.source_directory is None:
+        all = True
+        input_directory = args.source_directory
+    elif not  cfg["exec"]:
         daeseguire.append(input("Inserisci il nome del file: "))
     elif "ALL" in cfg["exec"]:
         daeseguire = cfg['database']
@@ -142,6 +153,8 @@ def main():
             input_directory = nomifile["source_dir"]
         daeseguire = forallfiles(input_directory,nomifile["collections_concat"],"json")
 
+    if len(daeseguire) == 0:
+        warning_message(f"Non sono stati specificati file JSON da elaborare")
     for nome in daeseguire:
         print("nome:",nome)
         barename = Path(nome).stem

@@ -17,10 +17,10 @@ def error_message (msg):
 def warning_message(msg):
     print("⚠️",msg)
 
-def verify_field_existence (campi, keys):
+def verify_field_existence (campi,lab, keys):
     for campo in campi:
-        if not (campo in keys):
-            error_message(f"nel file manca il campo {campo}")
+        if not (lab[campo] in keys):
+            error_message(f"nel file manca il campo {lab[campo]}")
 
 def verify_mcq_choices(risp, lab):
     for i in range(len(risp[lab["statements"]])):
@@ -56,13 +56,13 @@ def verify_mcq_choices(risp, lab):
 
 def verifica(risp, istruzioni,lab):
     # first verify the existence of required fields
-    verify_field_existence(istruzioni["necessary_input_fields"]["all"].values(), risp.keys())
+    verify_field_existence(istruzioni["necessary_input_fields"]["all"],lab, risp.keys())
     if risp[lab["question_type"]] == "dd":
-        verify_field_existence(istruzioni["necessary_input_fields"]["dd"].values(), risp.keys())
+        verify_field_existence(istruzioni["necessary_input_fields"]["dd"], lab,risp.keys())
     elif risp[lab["question_type"]] == "cloze":
-        verify_field_existence(istruzioni["necessary_input_fields"]["cloze"].values(), risp.keys())
+        verify_field_existence(istruzioni["necessary_input_fields"]["cloze"],lab, risp.keys())
     elif risp[lab["question_type"]] == "mcq":
-        verify_field_existence(istruzioni["necessary_input_fields"]["mcq"].values(), risp.keys())
+        verify_field_existence(istruzioni["necessary_input_fields"]["mcq"],lab, risp.keys())
     else:
         error_message(f"Il tipo di domanda deve essere 'dd', 'cloze' o 'mcq'")
     num_aff = int(risp[lab["number_of_statements"]])
@@ -139,8 +139,9 @@ def verifica(risp, istruzioni,lab):
                         f"\nVerranno trattate come finite le scelte per cui  non è specificato nulla; verrà ignorata la specifica per scelte non esistenti.")
     # verifify options
     if lab["options"] in risp.keys():
+        meaningful_options = [lab[opt] for opt in istruzioni["meaningful_options"][risp[lab["question_type"]]]]
         for option in risp[lab["options"]]:
-            if not option in istruzioni["meaningful_options"][risp[lab["question_type"]]].values():
+            if not option in meaningful_options:
                 warning_message(f"L'opzione {option} non ha senso per questo tipo di domanda, verrà ignorata.")
 
 def controlla_json_friendly(percorso_file):

@@ -1,9 +1,8 @@
 {
-  "WARNING": "Do NOT change the keys in any of the following dictionaries",
-
-  "exec":[  "ALL"
-  ],
-   "database": [
+    "WARNING": "Do NOT change the keys in any of the following dictionaries",
+    "exec":[  "ALL"
+    ],
+    "database": [
 "animali_dd",
 "antigone_cloze_vf",
 "biancaneve_mcqM",
@@ -14,17 +13,17 @@
 "inglese_dd",
 "promessi_sposi_cloze_aperta_gruppi",
 "shakespeare_cloze_aperta"
-   ],
-  "filenames": {
+    ],
+    "filenames": {
     "sourcefile_prefix": "",
     "outfile_prefix": "raccolta_",
     "source_dir": "sorgenti",
     "out_dir": "raccolte",
     "collections_concat": "000_tutte"
-  },
+    },
 "WARNING1": "-------------------------------------------------------------------------------------",
 "WARNING2": "If you change the values in 'templates' you must change the corresponding file names accordingly. Do NOT change the keys",
-  "templates": {
+    "templates": {
     "template_dir": "templates",
     "template_quiz": "shell",
     "template_dragbox": "dragbox",
@@ -32,56 +31,71 @@
     "template_dd": "dd",
     "template_mcq": "mcq",
     "template_cloze": "cloze"
-  },
+    },
 "WARNING3": "-------------------------------------------------------------------------------------",
-"WARNING4": "If you modify the values in 'necessary_input_fields' and 'meaningful_options' you must correspondingly change the keys in all input files. Adding or deleting entries requires a change in the implementation. Do NOT change the keys",
-  "necessary_input_fields": {
-  "all": {
+"WARNING4": "Adding or deleting entries requires a change in the implementation. Do NOT change the keys",
+    "necessary_input_fields": {
+    "all": [
+    "category",
+    "question_name",
+    "question_type",
+    "number_of_statements",
+    "statements"
+    ],
+    "dd":[
+    "answers",
+    "task",
+    "answers_placeholder"
+    ],
+    "cloze": [
+    "cloze_type",
+    "answers",
+    "task"
+    ],
+    "mcq": [
+    "group_fractions",
+    "choices"
+    ]
+},
+"meaningful_options": {
+    "mcq": [
+    "multiple",
+    "moodle_shuffle"
+    ],
+"dd": [
+    "moodle_shuffle",
+    "itemized",
+    "all_orders"
+],
+"cloze": [
+    "all_orders",
+    "itemized"
+]},
+    "cloze_types": {"one_answer": ["MULTICHOICE_H","MULTICHOICE_V","MULTICHOICE_VS", "MULTICHOICE_HS", "SHORTANSWER"],"many_answers":
+    []
+},
+"WARNING5": "-------------------------------------------------------------------------------------",
+"WARNING6": "If you modify the values in 'necessary_input_fields' and 'meaningful_options' you must correspondingly change the keys in all input files. Adding or deleting entries requires a change in the implementation. Do NOT change the keys",
+"translation":{
     "category": "categoria",
     "question_name": "nome_domanda",
     "question_type": "tipo_domanda",
-    "number_of_statements": "numero_di_frasi",
-    "statements": "frasi"
-  },
-  "dd": {
-    "answers": "risposte",
-    "task": "consegna",
-    "answers_placeholder":"spazio_risposta"
-  },
-  "cloze": {
     "cloze_type":"tipo_di_cloze",
+    "number_of_statements": "numero_di_frasi",
+    "task": "consegna",
+    "statements": "frasi",
+    "statement": "frase",
+    "correct": "corretta",
     "answers": "risposte",
-    "task": "consegna"
-  },
-  "mcq": {
+    "answers_placeholder":"spazio_risposta",
     "group_fractions":"frazioni_gruppi",
-    "choices":"scelte"
-  },
-    "none": {
-      "computed_choices": "scelte_calcolate",
-      "options": "opzioni",
-      "statement": "frase",
-      "correct": "corretta",
-      "if_infinite": "se_infinite"
-    }
-},
-"meaningful_options": {
-  "mcq": {
+    "choices":"scelte",
+    "computed_choices": "scelte_calcolate",  
+    "if_infinite": "se_infinite",
+    "options": "opzioni",
     "multiple": "risposte_multiple",
-    "moodle_shuffle": "moodle_ordine_casuale"
-  },
-"dd": {
-  "moodle_shuffle": "moodle_ordine_casuale",
-  "itemized": "elenco_puntato",
-  "all_orders": "permutazioni"
-},
-"cloze": {
-  "all_orders": "permutazioni",
-  "itemized":"elenco_puntato"
-}},
-  "cloze_types": {"one_answer": ["MULTICHOICE_H","MULTICHOICE_V","MULTICHOICE_VS", "MULTICHOICE_HS", "SHORTANSWER"],"many_answers":
- []
-}
-
-
-}
+    "moodle_shuffle": "moodle_ordine_casuale",
+    "itemized": "elenco_puntato",
+    "all_orders": "permutazioni"
+    }
+    }

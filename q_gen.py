@@ -117,12 +117,7 @@ def main():
 
     verify_template_existence(template_files)
 
-    lab = {}
-    for key in cfg["necessary_input_fields"]:
-        lab.update(cfg["necessary_input_fields"][key])
-    for key in cfg["meaningful_options"]:
-        lab.update(cfg["meaningful_options"][key])
-
+    lab = cfg["key_names"]
     daeseguire = []
     input_directory = ""
     all = False

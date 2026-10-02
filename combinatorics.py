@@ -9,7 +9,6 @@
 
 
 from itertools import combinations, product
-import sys
 
 def genera_combinazioni(group_lens, choice, group_start):
     all_group_combs = []

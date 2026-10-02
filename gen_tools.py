@@ -79,8 +79,6 @@ def genera_template(risp, nomifile,lab):
             template = template.replace("__PHDRAGBOXES", template_db_inst + "\n__PHDRAGBOXES")
         template = template.replace("__PHDRAGBOXES", "")
 
-    # print(template)
-
     return template
 
 def complete_answers(risp,nomifile,lab):
@@ -91,12 +89,12 @@ def complete_answers(risp,nomifile,lab):
     for group in risp[lab["statements"]].keys():
         risp[COMPLETE_STATEMENTS][group] = []
         for rich_statement in risp[lab["statements"]][group]:
-            if risp[lab["question_type"]] == "dd" and not risp[lab["answers_placeholder"]] in rich_statement[lab["statement"]]:
+            if risp[lab["question_type"]] == "dd" and not risp[lab["answer_placeholder"]] in rich_statement[lab["statement"]]:
                 # here we must add the '[[number]]' at the end; it is in the 'corretta' field
                 risp[COMPLETE_STATEMENTS][group].append(rich_statement[lab["statement"]]  + ": [[" + rich_statement[lab["correct"]] + "]]")
             elif risp[lab["question_type"]] == "dd":
                 risp[COMPLETE_STATEMENTS][group].append(
-                    rich_statement[lab["statement"]].replace(risp[lab["answers_placeholder"]],"[[" + rich_statement[lab["correct"]] + "]]"))
+                    rich_statement[lab["statement"]].replace(risp[lab["answer_placeholder"]],"[[" + rich_statement[lab["correct"]] + "]]"))
             elif risp[lab["question_type"]] == "mcq":
                 if group != "1": # poiché il gruppo 1 per mcq è la domanda, deve rimanere cosí com'è e non prendere la struttura di una risposta (vedi dopo)
                     tmp = template_affermazioni
@@ -105,8 +103,7 @@ def complete_answers(risp,nomifile,lab):
                                                                                            rich_statement[lab["correct"]]))
             elif risp[lab["question_type"]] == "cloze" and risp[lab["cloze_type"]] == "SHORTANSWER":
                 # # if it is a SHORTANSWER kind of cloze, the answer is already composed in the filler, 'correct' says which is the placeholder and the correct filler
-                # risp[COMPLETE_STATEMENTS][group].append(rich_statement[lab["statement"]].replace(rich_statement[lab["correct"]],risp[lab["answers"]][rich_statement[lab["correct"]]]))
-                risp[COMPLETE_STATEMENTS][group].append(rich_statement[lab["statement"]].replace(risp[lab["answers_placeholder"]],
+                risp[COMPLETE_STATEMENTS][group].append(rich_statement[lab["statement"]].replace(risp[lab["answer_placeholder"]],
                                                                                               risp[lab["answers"]][
                                                                                                   group]))
             elif risp[lab["question_type"]] == "cloze":
@@ -123,11 +120,6 @@ def complete_answers(risp,nomifile,lab):
                     # però in verify anche il gruppo 1 è stato trasformato in dictionary, e lo voglio di nuovo una lista
                     # (ha senso questo avanti e dietro? lo avevo fatto per uniformità)
             risp[COMPLETE_STATEMENTS]["1"] = [rich_answer[lab["statement"]] for rich_answer in risp[lab["statements"]]["1"]]
-
-# def is_mcq_single(choice, risp):
-#     if sum(int(choice[i]) for i in range(2,len(choice)) if float(risp[lab["group_fraction"]]) > 0) > 1:
-#         return False
-#     return True
 
 def prepare_questions(risp, template,lab):
     tutte_le_domande = ""
@@ -165,9 +157,7 @@ def prepare_questions(risp, template,lab):
     numero_q = 1
     for scelte in varianti_scelte:
         conto=conto+1
-        # print("scelte:", scelte)
         combinations, where_from = genera_combinazioni(groups_dimensions, scelte, [])
-        # print("COMBINAZIONI:",len(combinations))
 
         print(f"\t {conto} - numero di domande per {scelte}: {len(combinations)}, totale: {len(combinations) * numero_perm}")
         for comb in combinations:
@@ -201,9 +191,7 @@ def prepare_questions(risp, template,lab):
                     statement = risp[COMPLETE_STATEMENTS][str(where_from[i])][comb[i]]
                     # the statement is copied in one of the placeholders, depending on the permutation (shuffle)
                     temp = temp.replace("AFFERMAZIONE" + str(shuffle[i]), statement)
-                    # print(f"inquesta domanda sostituisco adesso l' AFFERMAZIONE{shuffle[i]} con la risposta da {where_from[i]}: {risp[COMPLETE_STATEMENTS][str(where_from[i])][comb[i]]}")
                 tutte_le_domande = tutte_le_domande + "\n" + temp
 
-        # print(numero_q-1, "domande generate")
         numero_totale_domande = numero_q - 1
     return tutte_le_domande, numero_totale_domande

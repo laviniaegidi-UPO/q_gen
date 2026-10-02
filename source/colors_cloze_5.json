@@ -1,0 +1,37 @@
+{
+  "category": "examples/colors_cloze5",
+  "question_name": "Colors - cloze",
+  "question_type": "cloze",
+  "cloze_type": "MULTICHOICE_HS",
+  "number_of_statements": "4",
+  "choices": [[2, 1, 1]],
+  "answers": {
+    "1": "red",
+    "8": "yellow",
+    "BL": "blue",
+    "4": "green",
+    "5": "white"
+  },
+  "options": ["bullet_list"],
+  "task": "Indicate the correct color for each item:",
+
+  "statements": {
+    "1": [
+      {"statement": "The sky", "correct": "BL"},
+      {"statement": "The sun", "correct": "8"},
+      {"statement": "Pine needles", "correct": "4"},
+      {"statement": "Snow", "correct": "5"},
+      {"statement": "Blood", "correct": "1"}
+    ],
+    "2": [
+      {"statement": "The edible part of a watermelon", "correct": "1"},
+      {"statement": "The rind of a watermelon", "correct": "4"},
+      {"statement": "Refined sugar", "correct": "5"},
+      {"statement": "Cornmeal", "correct": "8"}
+    ],
+    "3": [
+      {"statement": "The jersey of the Italian national sports teams", "correct": "BL"},
+      {"statement": "The central color of the Italian flag", "correct": "5"}
+    ]
+  }
+}

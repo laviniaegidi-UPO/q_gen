@@ -9,224 +9,162 @@
 
 import json
 import sys
+from string import Template
 
-def error_message (msg):
-    print("❌",msg)
-    sys.exit(1)
+def message(message_templates,msg,parameters):
+    template = Template(message_templates[msg])
+    tbp = template.safe_substitute(parameters)
 
-def warning_message(msg):
-    print("⚠️",msg)
+    if msg.startswith("ERROR"):
+        print("❌", tbp)
+        sys.exit(1)
+    elif msg.startswith("WARNING"):
+        print("⚠️", tbp)
+    elif msg.startswith("OK"):
+        print("✅",tbp)
+    elif msg.startswith("INFO"):
+        print("➡️",tbp)
+    elif msg.startswith("DET"):
+        print("🔍",tbp)
+    else:
+        print(tbp)
 
-def verify_field_existence (campi,lab, keys):
+
+def verify_field_existence (messages,campi,lab, keys):
     for campo in campi:
         if not (lab[campo] in keys):
-            error_message(f"nel file manca il campo {lab[campo]}")
+            message(messages,"ERROR_MISSING_KEY",{"key":lab[campo]})
 
-def verify_mcq_choices(risp, lab):
+def verify_mcq_choices(messages, risp, lab):
     for i in range(len(risp[lab["statements"]])):
         if str(i+1) not in risp[lab["group_fractions"]].keys():
             risp[lab["group_fractions"]][str(i+1)] = "0"
     for key in risp[lab["group_fractions"]]:
         risp[lab["group_fractions"]][key] = risp[lab["group_fractions"]][key].replace(',','.')
     for choice in risp[lab["choices"]]:
-        if choice[0] != 1:
-            error_message(f"Nella scelta {choice} il primo elemento deve sempre essere '1' ed è invece {choice[0]}")
+        if int(choice[0]) != 1:
+            message(messages,"ERROR_MCQ_FIRST",{"choice":choice, "choice_value":choice[0]})
         somma = sum(int(choice[i])*float(risp[lab["group_fractions"]][str(i+1)]) for i in range(1,len(choice)) if float(risp[lab["group_fractions"]][str(i+1)]) > 0)
         if somma != 100:
-            error_message(f"La somma delle frazioni delle risposte corrette deve essere 100. Per la scelta {choice} la somma è {somma}")
+            message(messages,"ERROR_MCQ_SUM",{"choice":choice, "sum":somma})
 
         multiple_answers = lab["options"] in risp and lab["multiple"] in risp[lab["options"]] or sum(choice[int(i)-1] for i in risp[lab["group_fractions"]]
                                                                                                      if (len(choice) >= int(i) > 1 and float(risp[lab["group_fractions"]][i]) > 0) > 1)
         a_null_fraction = sum(1 for i in risp[lab["group_fractions"]]
             if (int(i) <= len(choice) and int(i) > 0 and choice[int(i)-1] > 1 and float(risp[lab["group_fractions"]][i]) == 0) > 0)
-        # if len(choice) >= 5:
-        #     print(f"a_null_fraction = {a_null_fraction}")
-        #     flotta = float(risp[lab['group_fractions']][i]
-        #     print(f"choice: {choice}, i: {i}; choice[int(i)-1] {choice[int(i)-1]}, group fraction: {flotta}")
         if multiple_answers and a_null_fraction:
-            warning_message(f"La domanda accetta risposte multiple, ma per la scelta {choice} sono definite opzioni con punteggio 0")
+            message(messages,"WARNING_MCQ_ZERO",{"choice":choice})
 
 
-        # multiple_answers = lab["options"] in risp and lab["multiple"] in risp[lab["options"]] or sum(
-        #     1 for x in choice
-        #     if 0 == (x > 0 and
-        #              str(x) in risp[lab["group_fractions"]]
-        #              and float(risp[lab["group_fractions"]][str(x)]) == 0)
-
-
-def verifica(risp, istruzioni,lab):
+def verify_semantics(messages,risp, istruzioni,lab):
     # first verify the existence of required fields
-    verify_field_existence(istruzioni["necessary_input_fields"]["all"],lab, risp.keys())
-    if risp[lab["question_type"]] == "dd":
-        verify_field_existence(istruzioni["necessary_input_fields"]["dd"], lab,risp.keys())
-    elif risp[lab["question_type"]] == "cloze":
-        verify_field_existence(istruzioni["necessary_input_fields"]["cloze"],lab, risp.keys())
-    elif risp[lab["question_type"]] == "mcq":
-        verify_field_existence(istruzioni["necessary_input_fields"]["mcq"],lab, risp.keys())
-    else:
-        error_message(f"Il tipo di domanda deve essere 'dd', 'cloze' o 'mcq'")
+    verify_field_existence(messages,istruzioni["necessary_input_fields"]["all"],lab, risp.keys())
+    supported_q_types = istruzioni["supported_question_types"]
+    supported = False
+    for q_type in supported_q_types:
+        if risp[lab["question_type"]] == q_type:
+            supported = True
+            verify_field_existence(messages,istruzioni["necessary_input_fields"][q_type], lab,risp.keys())
+    if not supported:
+        q_type_list = ", ".join(supported_q_types)
+        message(messages,"ERROR_UNSUPPORTED_Q_TYPE",{"qtype_list":q_type_list})
     num_aff = int(risp[lab["number_of_statements"]])
     # verify that risp[lab["statements"]] is a dictionary and that it has all keys in the range 1-num_max
     if not isinstance(risp[lab["statements"]],dict):
-        error_message(f"il campo 'sentences' deve essere un dizionario")
+        message(messages,"ERROR_MUST_BE_DICT",{"key":lab["statements"]})
     num_gruppi_frasi = len(risp[lab["statements"]].keys())
     chiavi_continue = {str(i) for i in range(1, len(risp[lab["statements"]].keys())+1)}
     if risp[lab["statements"]].keys() != chiavi_continue:
-            print(risp[lab["statements"]].keys(),chiavi_continue)
-            error_message(
-                f"I gruppi di risposte devono essere numerati da 1 a {len(risp[lab["statements"]].keys())}, mancano {chiavi_continue-risp[lab["statements"]].keys()}")
-
-    # a lab["sentence"] can be a list or a dict; if it is a dict it must have both required fields
+           message(messages,"ERROR_MISSING_GROUP_KEYS",{"max":str(len(risp[lab["statements"]].keys())),"missing_keys":", ".join(chiavi_continue-risp[lab["statements"]].keys())} )
 
     for chiave, elenco in risp[lab["statements"]].items():
         for domanda in elenco:
             if isinstance(domanda, dict):
                 # verify that the rich_statements have both requires fields
                 if not (lab["statement"] in domanda.keys()) or not (lab["correct"] in domanda.keys()):
-                    error_message(f"In una delle domande del gruppo {chiave} manca un campo")
+                    message(messages,"ERROR_MISSING_STATEMENT_KEYS",{"group":chiave,"statement_key":lab["statement"],"correct_key":lab["correct"]})
 
                 # verify that each 'correct' field point to a specified 'answer'
                 if risp[lab["question_type"]] != "mcq" and domanda[lab["correct"]] not in risp[lab["answers"]].keys():
-                    error_message(f"La risposta corretta indicata per la domanda \n\t {domanda[lab["statement"]]} \n({domanda[lab["correct"]]}) \nnon è tra le scelte possibili elencate in 'answers'")
+                    message(messages,"ERROR_UNMATCHED_CORRECT_ANS",{"statement":domanda[lab["statement"]],"correct":domanda[lab["correct"]],"answers_key":lab["answers"]})
                 #verify that each dd question has a hole to be filled
-                if risp[lab["question_type"]] == "dd" and not risp[lab["answers_placeholder"]] in domanda[lab["statement"]]:
-                    error_message(
-                        f"Nella domanda \n\t {domanda[lab["statement"]]} \nnon è previsto alcun 'buco' da riempire "+
-                        f"o non è usata la stringa {risp[lab["answers_placeholder"]]} dichiarata come place holder")
+                if risp[lab["question_type"]] == "dd" and not risp[lab["answer_placeholder"]] in domanda[lab["statement"]]:
+                    message(messages,"ERROR_MISSING_HOLE",{"statement":domanda[lab["statement"]],"place_holder":risp[lab["answer_placeholder"]]})
+
 
     # verify that choices (if existing) make sense
     if lab["choices"] in risp.keys() and (len(risp[lab["choices"]]))>0:
-        # num_gruppi_frasi = len(risp[lab["statements"]].keys())
         for lista in risp[lab["choices"]]:
             if len(lista) > num_gruppi_frasi:
-                error_message(f"La lista {lista} in 'varianti_scelte' non ha la lunghezza giusta: deve avere al massimo {num_gruppi_frasi} elementi, quanto il numero di gruppi di frasi")
+                message(messages,"ERROR_TOO_LONG_CHOICE",{"choice":str(lista),"choices_key":lab["choices"],"groups_number": str(num_gruppi_frasi)})
             elif len(lista) < num_gruppi_frasi:
-                warning_message(f"La lista {lista} in 'varianti_scelte' è piú corta del numero dei gruppi di frasi {num_gruppi_frasi}. Per i rimanenti gruppi verrà considerato 0. ")
+                message(messages,"WARNING_TOO_SHORT_CHOICE",{"choice":str(lista),"choices_key":lab["choices"],"groups_number": str(num_gruppi_frasi)})
             somma = sum(lista)
             if somma != num_aff:
-                error_message(f"Le varianti nella lista {lista} non hanno somma pari al 'numero_affermazioni' {num_aff} ma hanno somma {somma}" )
+                message(messages,"ERROR_CHOICE_SUM",{"choice":str(lista),"number_of_statements_key":lab["number_of_statements"],"number_of_statements": str(num_aff),"sum":str(somma)})
             for choice in risp[lab["choices"]]:
                 for i in range(len(choice)):
                     if choice[i] > len(risp[lab["statements"]][str(i+1)]):
-                        error_message(f"Non ci sono abbastanza frasi per l'{i+1}-esima scelta {choice[i]} in {choice}")
+                        message(messages,"ERROR_CHOICE_INSUFF_GROUP",{"choice":choice, "group":str(i+1),"choice_value":choice[i]})
         # verifies that that the first statement (which serves as question) is always chosen exactly once (choice = 1) and that the answer fractions sum to 100
         if risp[lab["question_type"]] == "mcq":
-            verify_mcq_choices(risp,lab)
-    # the following checks an advanced feature (to be completed)
-    elif lab["computed_choices"] in risp.keys() and len(risp[lab["computed_choices"]])>0:
-        sum_of_computed_choices = 0
-        for constraint in risp[lab["computed_choices"]]:
-            if (lab["range"] not in constraint.keys()) or (lab["choices"] not in constraint.keys()):
-                error_message(f"Il campo {constraint} in 'computed_choices' non ha almeno uno dei campi 'range' e 'choices' richiesti")
-            elif len(constraint[lab["range"]]) == 0:
-                num_gruppi = len(risp[lab["statements"]])
-                warning_message(f"Avviso: verrà usato il range 1-{num_gruppi} per il vincolo {constraint} in 'computed_choices'")
-            if lab["choices"] in constraint.keys():
-                try:
-                    int(constraint[lab["choices"]])
-                except:
-                    error_message(f"Il campo 'choices' in {constraint} di  'computed_choices' deve essere un intero")
-            sum_of_computed_choices = sum_of_computed_choices + int(constraint[lab["choices"]])
-        if sum_of_computed_choices != num_aff:
-            error_message(f"le scelte in 'computed_choices' sono in totale {sum_of_computed_choices} ma il numero richiesto in 'number_of_statements è {num_aff}")
-    # check that the cloze type is among those managed
+            verify_mcq_choices(messages,risp,lab)
+
     if risp[lab["question_type"]] == "cloze" and not risp[lab["cloze_type"]] in istruzioni["cloze_types"]["one_answer"]:
-                error_message('non so gestire il tipo_cloze specificato')
+                message(messages,"ERROR_UNSUPPORTED_CLOZE",{"cloze_type":risp[lab["cloze_type"]],"cloze_type_list": ", ".join(istruzioni["cloze_types"]["one_answer"])})
+                # error_message('non so gestire il tipo_cloze specificato')
     # for dd questions check that for each possible answer it is specificed whether it must be infinite
     if risp[lab["question_type"]] == "dd":
         if not lab["if_infinite"] in risp.keys() or (lab["if_infinite"] in risp.keys()) and (risp[lab["if_infinite"]].keys() != risp[lab["answers"]].keys()):
-            warning_message(f"Questo messaggio compare perché per alcune o tutte le scelte drag&drop non è specificato se sono infinite e/o è specificato anche per scelte non esistenti."+
-                        f"\nVerranno trattate come finite le scelte per cui  non è specificato nulla; verrà ignorata la specifica per scelte non esistenti.")
-    # verifify options
+            message(messages,"WARNING_UNSPECIFIED_IFINFINITE",{})
+
     if lab["options"] in risp.keys():
         meaningful_options = [lab[opt] for opt in istruzioni["meaningful_options"][risp[lab["question_type"]]]]
         for option in risp[lab["options"]]:
             if not option in meaningful_options:
-                warning_message(f"L'opzione {option} non ha senso per questo tipo di domanda, verrà ignorata.")
+                message(messages,"WARNING_NON_MEANINGFUL_OPTION",{"option":option})
 
-def controlla_json_friendly(percorso_file):
+def controlla_json_friendly(messages,percorso_file):
     try:
         with open(percorso_file, 'r', encoding='utf-8') as f:
             contenuto = f.read()
-
         dati = json.loads(contenuto)
-        print(f"✅ Il file {percorso_file} è sintatticamente corretto")
+        message(messages,"OK_JSON", {"path":percorso_file})
         return dati
 
     except FileNotFoundError:
-        print(f"❌ Errore: Il file '{percorso_file}' non esiste.")
+        message(messages,"ERROR_NOTFOUND",{"path":percorso_file})
         sys.exit(1)
 
     except json.JSONDecodeError as e:
-        print("❌ Errore di sintassi nel JSON rilevato!\n")
-        print(f"📌 Dettagli dell'errore:")
+
 
         # Se l'errore è "Expecting ',' delimiter" ma siamo a fine riga/fine file,
         # significa quasi sempre che manca un '}' o un ']' di chiusura.
-        messaggio_chiaro = e.msg
-        if "Expecting ',' delimiter" in e.msg:
-            messaggio_chiaro += " ⚠️ (Nota: Spesso questo errore indica che manca una '}' o ']' di chiusura alla fine dell'oggetto o dell'ultimo elemento!)"
+        message(messages, "MSG_ERROR_JSON", {"json_error_message": e.msg})
 
-        print(f"   - Messaggio: {messaggio_chiaro}")
-        print(f"   - Riga:      {e.lineno}")
-        print(f"   - Colonna:   {e.colno}")
+        if "Expecting ',' delimiter" in e.msg:
+            message(messages, "WARNING_JSON_MISSING_DELIMITER",{})
+        message(messages,"MSG_JSON_LINECOL_INFO",{"line_number":e.lineno, "col_number":e.colno})
         print("-" * 50)
 
         righe = contenuto.splitlines()
         riga_errore_idx = e.lineno - 1
 
-        print("🔍 Anteprima del codice:")
+        message(messages,"DET_JSON_CODE_PREVIEW",{})
 
         if riga_errore_idx > 0:
-            print(f"  {e.lineno - 1:4d} | {righe[riga_errore_idx - 1]}")
+            print(f"   {e.lineno - 1:4d} | {righe[riga_errore_idx - 1]}")
 
         if riga_errore_idx < len(righe):
             riga_corrente = righe[riga_errore_idx]
+
             print(f"👉 {e.lineno:4d} | {riga_corrente}")
-            spazi = " " * max(0, e.colno - 1)
-            print(f"         {spazi}^--- Errore qui o elemento non chiuso precedentemente")
+            spazi = " " * max(0, e.colno - 1)+"         "
+            message(messages, "MSG_spaces", {"spaces": spazi})
 
         if riga_errore_idx < len(righe) - 1:
-            print(f"  {e.lineno + 1:4d} | {righe[riga_errore_idx + 1]}")
+            print(f"   {e.lineno + 1:4d} | {righe[riga_errore_idx + 1]}")
 
         print("-" * 50)
         sys.exit(1)
-
-
-def formatta_json(nome_file):
-    try:
-        # 1. Legge e decodifica il file JSON
-        with open(nome_file, "r", encoding="utf-8") as f:
-            dati = json.load(f)
-
-        # 2. Riscrive il file formattato pulito
-        with open(nome_file, "w", encoding="utf-8") as f:
-            json.dump(dati, f, indent=4, ensure_ascii=False)
-
-        print(f"✅ File '{nome_file}' formattato con successo!")
-
-    except FileNotFoundError:
-        print(f"❌ Errore: Il file '{nome_file}' non esiste.")
-    except json.JSONDecodeError as e:
-        print(f"❌ Errore: Il file '{nome_file}' non è un JSON valido.")
-        print(f"   Dettaglio errore (riga {e.lineno}, colonna {e.colno}): {e.msg}")
-    except Exception as e:
-        print(f"❌ Si è verificato un errore imprevisto: {e}")
-
-def main (nomefile):
-    formatta_json(nomefile)
-    print("sono qui, il file è", nomefile)
-    controlla_json_friendly(nomefile)
-    return 0
-
-if __name__ == "__main__":
-    # sys.argv contiene gli argomenti passati da riga di comando.
-    # sys.exit() per restituire un codice di stato al sistema operativo.
-    # Leggi gli argomenti fuori dal main e gestisci eventuali valori mancanti
-    if len(sys.argv) > 1:
-        nome_input = sys.argv[1]
-        main(nome_input)
-    else:
-        print("Nessun file da controllare")
-        print("Uso: python verify.py <nome>")
-#         sys.exit(main(sys.argv[1:]))

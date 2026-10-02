@@ -1,0 +1,28 @@
+{
+"category":"examples/english_dd",
+"question_name":"Animal groups - dd",
+"question_type":"dd",
+"number_of_statements":"3",
+"choices":[],
+"answers":{"1":"pride","2":"school","3":"flock","4":"herd","5":"pod","6":"pack","7":"murder"},
+"if_infinite": {"1": "infinite","2":"infinite","3":"infinite","4":"infinite","5":"infinite","6":"infinite","7":"infinite"},
+"options":["bullet_list","moodle_shuffle"],
+"task":"Complete the following sentences correctly",
+"answer_placeholder":"__PLACEHOLDER",
+
+"statements":{
+"1":[
+{"statement":"a __PLACEHOLDER of lions","correct":"1"},
+{"statement":"a __PLACEHOLDER of fish","correct":"2"},
+{"statement":"a __PLACEHOLDER of geese","correct":"3"},
+{"statement":"a __PLACEHOLDER of cows","correct":"4"},
+{"statement":"a __PLACEHOLDER of sheep","correct":"3"},
+{"statement":"a __PLACEHOLDER of dolphins","correct":"5"},
+{"statement":"a __PLACEHOLDERof wales","correct":"5"},
+{"statement":"a __PLACEHOLDER of wolves","correct":"6"},
+{"statement":"a __PLACEHOLDER of crows","correct":"7"},
+{"statement":"a __PLACEHOLDER of dogs","correct":"6"}
+]
+}
+
+}

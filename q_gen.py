@@ -10,76 +10,80 @@
 import json
 import argparse
 from pathlib import Path
-from verify import controlla_json_friendly, verifica, error_message, warning_message
+from verify import controlla_json_friendly, verify_semantics, message
 from gen_tools import *
 import sys
 import os
+
 
 FILE_CONFIG = "config.json"
 # defines inputs and options
 def parse_args():
     parser = argparse.ArgumentParser(
         prog='q_gen',
-        description='genera domande in formato Moodle XML da file JSON in input')
+        description='generates collections of questions in XML Moodle format from input JSON files')
 
-    parser.add_argument("-i", "--input_file", help="file in input", type=str)
-    parser.add_argument("-s", "--source_directory", help="elaborare tutti i file nella cartella source_directory",
+    parser.add_argument("-i", "--input_file", help="input file", type=str)
+    parser.add_argument("-s", "--source_directory", help="process all files in the specified source directory",
                         type=str)
     parser.add_argument("-o", "--out_dir", help="output directory", type=str)
-    parser.add_argument("-j", "--join_dir", help="concatena i file specificati nella cartella join_directory", type=str)
-    parser.add_argument("-c", "--config_file", help="usa config_file come file di configurazione (default config.json); config_file deve essere in formato JSON", type=str)
+    parser.add_argument("-j", "--join_dir", help="join all XML files from the specified join_directory (if there is already a join file, it is disregarded)", type=str)
+    parser.add_argument("-c", "--config_file", help="use specified config_file as configuration file (default is config.json); the config_file must be in JSON format", type=str)
+    parser.add_argument("-v", "--verify_json_file",
+                        help="verify that the JSON input file is syntactically correct (useful after preparing new configuration files)",
+                        type=str)
     return parser.parse_args()
 
-def forallfiles(input_directory,complete_quiz, extension):
+def forallfiles(input_directory,complete_raccolta, extension):
     allfiles = []
     for filename in os.listdir(input_directory):
-        if filename.endswith("."+extension) and not filename.startswith(complete_quiz):
+        if filename.endswith("."+extension) and not filename.startswith(complete_raccolta):
             allfiles.append(os.path.join(input_directory,filename))
     return allfiles
 
-def verify_template_existence(names):
+def verify_template_existence(messages,names):
     for temp_name in names.values():
         if not os.path.exists(temp_name):
-            error_message(f"Errore! Non esiste il template {temp_name}. Devono esistere i template necessari.")
+            message(messages,"ERROR_NOTFOUND",{"path":temp_name})
 
-def concatena(cfg,dir_da_concatenare,nomifile):
+def join_collections(messages, dir_da_concatenare, nomifile):
 
     da_concatenare = forallfiles(dir_da_concatenare, nomifile["collections_concat"], "xml")
     if len(da_concatenare) == 0:
-        error_message(f"Nella cartella {dir_da_concatenare} non ci sono quiz")
+        message(messages,"ERROR_NOFILES_TYPE",{"dir":dir_da_concatenare,"file_type":"XML"})
 
-    print(f"➡️ Concatenazione dei quiz:")
+    message(messages,"INFO_concat",{})
 
-    with open( nomifile["template_quiz"], 'r') as shellfile:
+    with open( nomifile["template_collection"], 'r') as shellfile:
         shell_lines = shellfile.readlines()
 
-    quiz_completo = shell_lines[:2]
+    raccolta_completa = shell_lines[:2]
 
-    for nomefilequiz in da_concatenare:
-        print(f"\t{nomefilequiz}")
+    for nomefileraccolta in da_concatenare:
+        message(messages,"MSG_tab",{"text":nomefileraccolta})
 
         # Apri il file originale in lettura e quello nuovo in scrittura
-        with open(nomefilequiz, "r", encoding="utf-8") as quiz:
-            righe = quiz.readlines()
+        with open(nomefileraccolta, "r", encoding="utf-8") as raccolta:
+            righe = raccolta.readlines()
 
         # Seleziona dalla terza riga (indice 2) fino alla penultima (indice -1 escluso)
-        contenuto_quiz = righe[2:-1]
+        contenuto_raccolta = righe[2:-1]
 
-        quiz_completo = quiz_completo + ["\n"] + contenuto_quiz
+        raccolta_completa = raccolta_completa + ["\n"] + contenuto_raccolta
 
-    quiz_completo = quiz_completo + shell_lines[-1:]
+    raccolta_completa = raccolta_completa + shell_lines[-1:]
     concat_file = os.path.join(dir_da_concatenare, nomifile["collections_concat"]+".xml")
-    with open(concat_file, "w", encoding="utf-8") as file_quiz_completo:
-        file_quiz_completo.writelines(quiz_completo)
+    with open(concat_file, "w", encoding="utf-8") as file_raccolta_completa:
+        file_raccolta_completa.writelines(raccolta_completa)
 
-    print(f"\n➡️ Output salvato in {concat_file}")
+    message(messages,"INFO_out_collection",{"filename":concat_file})
     sys.exit(0)
 
 def main():
     print("\n")
     print("************************************************************")
     print("*******                   q_gen                   **********")
-    print("*******     generazione di domande per Moodle     **********")
+    print("*******              version 2/10/2026            **********")
     print("************************************************************")
     print("\n")
 
@@ -89,13 +93,10 @@ def main():
     if not args.config_file is None:
         config_file = args.config_file
     if not os.path.exists(config_file):
-        error_message(f"Errore! Non esiste il file {config_file}")
+        print(f"File {config_file} doesn't exist")
     elif not Path.is_file(config_file):
-        error_message(f"Errore! {config_file} non è un file: dopo l'opzione -c, specificare un file JSON")
+        print(f"{config_file} is not a file: after -c, specify a JSON file")
 
-
-    print("File di configurazione:",config_file)
-    cfg = controlla_json_friendly(config_file)
     with open(config_file, 'r') as file_db:
         cfg = json.load(file_db)
 
@@ -106,16 +107,27 @@ def main():
             template_files[key] = os.path.join(cfg["templates"]["template_dir"],cfg["templates"][key]+".xml")
     nomifile.update(template_files)
 
+    messages = cfg["messages"]["infos"]|cfg["messages"]["errors"]|cfg["messages"]["warnings"]
+
     if not args.join_dir is None:
         tbc_dir = args.join_dir
-        warning_message(f"È stata richiesta la concatenazione dei file nella cartella {tbc_dir}\n")
+        message(messages,"NFO_CONCAT",{"dir":tbc_dir})
         if not os.path.exists(tbc_dir):
-            error_message(f"Errore! Non esiste la cartella {tbc_dir}")
+            message(messages,"ERROR_NOTFOUND",{"path":tbc_dir})
         elif not Path.is_dir(tbc_dir):
-            error_message(f"Errore! {tbc_dir} non è una cartella: dopo l'opzione -j, specificare una cartella")
-        concatena(cfg, tbc_dir, nomifile)
+            message(messages,"ERROR_NOTDIR",{"path":tbc_dir,"opt":"-j"})
+        join_collections(messages, tbc_dir, nomifile)
 
-    verify_template_existence(template_files)
+    if not args.verify_json_file is None:
+        if not os.path.exists(args.verify_json_file):
+            message(messages,"ERROR_NOTFOUND",{"path":args.verify_json_file})
+        elif not Path.is_dir(args.verify_json_file):
+            message(messages,"ERROR_NOTFILE",{"path":args.verify_json_file,"opt":"-v"})
+        else:
+            controlla_json_friendly(messages,args.verify_json_file)
+            exit(0)
+
+    verify_template_existence(messages,template_files)
 
     lab = cfg["key_names"]
     daeseguire = []
@@ -124,20 +136,20 @@ def main():
 
     if not args.out_dir is None:
         if Path.exists(args.out_dir) and not Path.is_dir(args.out_dir):
-            error_message(f"Errore! {args.out_dir} è un file: dopo l'opzione -o, specificare una cartella")
+            message(messages,"ERROR_NOTDIR",{"path":args.out_dir,"opt":"-o"})
         nomifile["out_dir"] = args.out_dir
     if not args.input_file is None:
         if not Path.exists(args.input_file):
-            error_message(f"Errore! Il file {args.input_file} non esiste")
+            message(messages,"ERROR_NOTFOUND",{"path":args.input_file})
         elif not Path.is_file(args.input_file):
-            error_message(f"Errore! {args.input_file} non è un file: dopo l'opzione -i specificare il nome di un file")
+            message(messages,"ERROR_NOTFILE",{"path":args.input_file,"opt":"-i"})
         daeseguire = [args.input_file]
 
     elif not args.source_directory is None:
         all = True
         input_directory = args.source_directory
     elif not  cfg["exec"]:
-        daeseguire.append(input("Inserisci il nome del file: "))
+        daeseguire.append(input(cfg["INFO_insert_file_name"]))
     elif "ALL" in cfg["exec"]:
         daeseguire = cfg['database']
     else:
@@ -149,9 +161,8 @@ def main():
         daeseguire = forallfiles(input_directory,nomifile["collections_concat"],"json")
 
     if len(daeseguire) == 0:
-        warning_message(f"Non sono stati specificati file JSON da elaborare")
+        message(messages,"WARNING_no_files",{})
     for nome in daeseguire:
-        print("nome:",nome)
         barename = Path(nome).stem
         input_path = Path(nome).parent
         nomefilerisposte = barename + ".json"
@@ -163,14 +174,14 @@ def main():
             input_path = nomifile["source_dir"]
 
         nomefilerisposte = os.path.join(input_path,nomefilerisposte)
-        print(f"\n\n➡️ Elaborazione di {nomefilerisposte}")
+        message(messages,"INFO_PROCESSING",{"path":nomefilerisposte})
         if not os.path.exists(nomefilerisposte):
-            error_message(f"Errore! Non esiste il file {nomefilerisposte}")
+            message(messages,"ERROR_NOTFOUND",{"path":nomefilerisposte})
 
-        risposte = controlla_json_friendly(nomefilerisposte)
+        risposte = controlla_json_friendly(messages,nomefilerisposte)
 
-        verifica(risposte, cfg, lab)
-        print("✅ Il file", nomefilerisposte, "contiene i campi previsti e, per quanto verificato, è logicamente corretto")
+        verify_semantics(messages,risposte, cfg, lab)
+        message(messages,"OK_VERIFIED",{"filename":nomefilerisposte})
 
         # each statement can be a dictionary or it can be simple: it will be converted here to dictionary
         risposte[lab["statements"]] = convert_to_dictionary(risposte, lab)
@@ -180,30 +191,25 @@ def main():
         # in risposte[COMPLETE_STATEMENTS] the statements are in the correct moodle format, so the generation of combinations is no longer mixed with the preparation of the moodle syntax
         risposte[COMPLETE_STATEMENTS] = {}
         complete_answers(risposte, nomifile,lab)
-        # for group in risposte[COMPLETE_STATEMENTS]:
-        #     print(f"il gruppo {group} contiene {len(risposte[COMPLETE_STATEMENTS][group])} frasi")
 
         questions, numero_totale = prepare_questions(risposte, template,lab)
-        print("numero totale domande generate", numero_totale)
-        with open(nomifile["template_quiz"], 'r') as shellfile:
+        message(messages,"MSG_total_no_of_q",{"number":numero_totale})
+        with open(nomifile["template_collection"], 'r') as shellfile:
             shell = shellfile.read()
         template = shell.replace("__PHSINGOLEDOMANDE", questions).replace("__PHCATEGORY", risposte[lab["category"]])
 
         if not os.path.exists(nomifile["out_dir"]):
-            print(f"Creata la cartella {nomifile['out_dir']}")
             os.makedirs(nomifile["out_dir"])
+            message(messages,"INFO_dir_created",{"dir":nomifile["out_dir"]})
 
-        nomefilequiz = os.path.join(nomifile["out_dir"],nomifile["outfile_prefix"] + barename + ".xml")
-        print(f"Il quiz è nel file {nomefilequiz}")
-        with open(nomefilequiz, 'w', encoding='utf-8') as file:
+        nomefileraccolta = os.path.join(nomifile["out_dir"],nomifile["outfile_prefix"] + barename + ".xml")
+        message(messages,"INFO_out_collection",{"filename":nomefileraccolta})
+        with open(nomefileraccolta, 'w', encoding='utf-8') as file:
             file.write(template)
 
     return 0
 
 if __name__ == "__main__":
-    # sys.argv contiene gli argomenti passati da riga di comando.
-    # sys.exit() per restituire un codice di stato al sistema operativo.
     sys.exit(main())
-#         sys.exit(main(sys.argv[1:]))
 
 

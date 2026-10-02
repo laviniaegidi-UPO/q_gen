@@ -1,0 +1,27 @@
+{
+  "category": "examples/Antigone_cloze",
+  "question_name": "Sophocles' Antigone - cloze",
+  "question_type": "cloze",
+  "cloze_type": "MULTICHOICE_H",
+  "number_of_statements": "3",
+  "choices": [[1,1,1], [1,0,2]],
+  "answers": {"1": "true", "2": "false"},
+  "options": ["bullet_list", "permutations"],
+  "task": "Indicate for each of the following sentences whether it is true or false.",
+
+  "statements": {
+    "1": [
+      {"statement": "Antigone flees from Thebes", "correct": "2"},
+      {"statement": "Antigone is betrothed to Haemon", "correct": "1"}
+    ],
+    "2": [
+      {"statement": "The city of Thebes has 8 gates", "correct": "2"},
+      {"statement": "The city of Thebes is ruled by Creon", "correct": "1"}
+    ],
+    "3": [
+      {"statement": "Ismene is Jocasta's sister", "correct": "2"},
+      {"statement": "Ismene buries Polynices", "correct": "2"},
+      {"statement": "Ismene does not want to disobey the city", "correct": "1"}
+    ]
+  }
+}

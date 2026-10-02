@@ -1,0 +1,152 @@
+{
+    "WARNING": "Do NOT change the keys in any of the following dictionaries",
+    "exec":[  "ALL"
+    ],
+    "database": [
+"antigone_cloze_tf",
+"snow_white_mcqM",
+"chemistry_mcq1",
+"colors_cloze_5",
+"example_1perm",
+"example_allperms",
+"animals_dd",
+"ulysses_open_cloze_groups",
+"shakespeare_open_cloze"
+    ],
+    "filenames": {
+    "sourcefile_prefix": "",
+    "outfile_prefix": "collection_",
+    "source_dir": "source",
+    "out_dir": "collections",
+    "collections_concat": "000_all"
+    },
+"WARNING1": "-------------------------------------------------------------------------------------",
+"WARNING2": "If you change the values in 'templates' you must change the corresponding file names accordingly. Do NOT change the keys",
+    "templates": {
+    "template_dir": "templates",
+    "template_collection": "shell",
+    "template_dragbox": "dragbox",
+    "template_MCQ_answers": "mcq_answers",
+    "template_dd": "dd",
+    "template_mcq": "mcq",
+    "template_cloze": "cloze"
+    },
+"WARNING3": "-------------------------------------------------------------------------------------",
+"WARNING4": "Adding or deleting entries requires a change in the implementation. Do NOT change the keys",
+    "necessary_input_fields": {
+    "all": [
+    "category",
+    "question_name",
+    "question_type",
+    "number_of_statements",
+    "statements"
+    ],
+    "dd":[
+    "answers",
+    "task",
+    "answer_placeholder"
+    ],
+    "cloze": [
+    "cloze_type",
+    "answers",
+    "task"
+    ],
+    "mcq": [
+    "group_fractions",
+    "choices"
+    ]
+},
+"meaningful_options": {
+    "mcq": [
+    "multiple",
+    "moodle_shuffle"
+    ],
+"dd": [
+    "moodle_shuffle",
+    "itemized",
+    "all_orders"
+],
+"cloze": [
+    "all_orders",
+    "itemized"
+]},
+    "supported_question_types": ["dd","cloze","mcq"],
+    "cloze_types": {"one_answer": ["MULTICHOICE_H","MULTICHOICE_V","MULTICHOICE_VS", "MULTICHOICE_HS", "SHORTANSWER"],"many_answers":
+    []
+},
+"WARNING5": "-------------------------------------------------------------------------------------",
+"WARNING6": "If you modify the values in 'necessary_input_fields' and 'meaningful_options' you must correspondingly change the keys in all input files. Adding or deleting entries requires a change in the implementation. Do NOT change the keys",
+"key_names":{
+    "category": "category",
+    "question_name": "question_name",
+    "question_type": "question_type",
+    "cloze_type": "cloze_type",
+    "number_of_statements": "number_of_statements",
+    "task": "task",
+    "statements": "statements",
+    "statement": "statement",
+    "correct": "correct",
+    "answers": "answers",
+    "answer_placeholder": "answer_placeholder",
+    "group_fractions": "group_fractions",
+    "choices": "choices",
+    "computed_choices": "computed_choices",
+    "if_infinite": "if_infinite",
+    "options": "options",
+    "multiple": "multiple_answers",
+    "moodle_shuffle": "moodle_shuffle",
+    "itemized": "bullet_list",
+    "all_orders": "permutations"
+    },
+
+    "WARNING6": "-------------------------------------------------------------------------------------",
+"WARNING7": "messages",
+"messages": {
+    "infos": {
+        "INFO_CONCAT": "File concatenation requested in folder $dir",
+        "MSG_tab": "\t $text",
+        "MSG_spaces": "$spaces^--- Error here or element not closed previously",
+        "INFO_insert_file_name": "Enter the name or path of the file to process",
+        "OK_VERIFIED": "The file $filename contains the expected fields and, as far as verified, is logically correct",
+        "MSG_total_no_of_q": "total number of questions generated: $number",
+        "INFO_dir_created": "Created folder '$dir'",
+        "INFO_out_collection": "The output collection is in file $filename\n\n",
+        "INFO_concat": "Concatenating collections:",
+        "OK_JSON": "The format of file $path is correct",
+        "MSG_ERROR_JSON": "JSON syntax error detected!\nError details: $json_error_message",
+        "MSG_JSON_LINECOL_INFO": "\t-line: $line_number\n\t-column: $col_number",
+        "DET_JSON_CODE_PREVIEW": "Code preview:",
+        "INFO_PROCESSING": "Processing file $path"
+    },
+    "errors": {
+        "ERROR_NOTFOUND": "Error! $path not found",
+        "ERROR_NOTDIR": "Error! $path is not a folder: specify a folder after the option $opt",
+        "ERROR_NOTFILE": "Error! $path is not a file: specify a file after the option $opt",
+        "ERROR_NOFILES_TYPE": "Error! No $file_type files found in folder $dir",
+        "ERROR_MISSING_KEY": "Missing key $key in file",
+        "ERROR_UNSUPPORTED_Q_TYPE": "Supported question types are $qtype_list",
+        "ERROR_MUST_BE_DICT": "The value of '$key' must be a dictionary",
+        "ERROR_MISSING_GROUP_KEYS": "Answer groups must be numbered from 1 to $max. Missing: $missing_keys",
+        "ERROR_MISSING_STATEMENT_KEYS": "In one of the questions in group $group, key '$statement_key' or key '$correct_key' is missing",
+        "ERROR_UNMATCHED_CORRECT_ANS": "The answer $correct indicated as correct for statement \n\t '$statement'  \nis not among the possible choices listed in '$answers_key'",
+        "ERROR_MISSING_HOLE": "In question \n\t $statement \nthere is no blank to fill or the string $place_holder declared as placeholder is not used",
+        "ERROR_TOO_LONG_CHOICE": "List $choice in '$choices_key' does not have the correct length: it must have at most $groups_number elements, matching the number of statement groups",
+        "ERROR_CHOICE_SUM": "The choices in list $choice do not sum to '$number_of_statements_key' $number_of_statements, but sum to $sum",
+        "ERROR_CHOICE_INSUFF_GROUP": "Choice $choice: there are not enough statements in group $group to select $choice_value statements.",
+        "ERROR_UNSUPPORTED_CLOZE": "The specified cloze_type ($cloze_type) is not supported. \nSupported cloze types: $cloze_type_list.",
+        "ERROR_MCQ_FIRST": "In the choice $choice the first element is $choice_value, but it must always be '1' for an 'mcq' question.",
+        "ERROR_MCQ_SUM": "The sum of fractions of correct answers must be 100 in a 'mcq' question. For the choice $choice the sum is $sum",
+        "ERROR_UNKNOWN": "An unexpected error occurred: $error"
+
+    },
+    "warnings": {
+        "WARNING_no_files": "No JSON files specified to process",
+        "WARNING_TOO_SHORT_CHOICE": "List $choice in '$choices_key' is shorter than the number of statement groups $groups_number. Remaining groups will default to 0.",
+        "WARNING_UNSPECIFIED_IFINFINITE": "This message appears because for some or all drag&drop options it is not specified whether they are infinite and/or it is also specified for non-existent choices.\nChoices with no specification will be treated as finite; specifications for non-existent choices will be ignored",
+        "WARNING_NON_MEANINGFUL_OPTION": "Option $option is invalid for this question type and will be ignored.",
+        "WARNING_JSON_MISSING_DELIMITER": "\tNote: This error often indicates a missing closing '}' or ']' at the end of the object or last element!",
+        "WARNING_MCQ_ZERO": "The question accepts multiple answers, but for the list $choice some of the choices have value 0"
+
+    }
+    }
+}

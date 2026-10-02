@@ -5,15 +5,14 @@
 "tipo_di_cloze": "MULTICHOICE_HS",
 "numero_di_frasi":"4",
 "scelte":[[2, 1, 1]],
-"risposte":{"1": "rosso","2":"giallo", "3":"azzurro","4":"verde","5":"bianco"},
-"se_infinite": {"1": "infinite","2":"infinite"},
+"risposte":{"1": "rosso","8":"giallo", "A":"azzurro","4":"verde","5":"bianco"},
 "opzioni": ["elenco_puntato"],
 "consegna":"Indicate per ogni voce il colore corretto:",
 
 "frasi":{
 "1":[
-{"frase":"Il cielo","corretta":"3"},
-{"frase":"Il sole","corretta":"2"},
+{"frase":"Il cielo","corretta":"A"},
+{"frase":"Il sole","corretta":"8"},
 {"frase":"Gli aghi di pino","corretta":"4"},
 {"frase":"La neve","corretta":"5"},
 {"frase":"Il sangue","corretta":"1"}],
@@ -21,10 +20,10 @@
 {"frase":"La parte commestibile dell'anguria","corretta":"1"},
 {"frase":"La buccia dell'anguria","corretta":"4"},
 {"frase":"Lo zucchero raffinato","corretta":"5"},
-{"frase":"La farina di mais","corretta":"2"}
+{"frase":"La farina di mais","corretta":"8"}
 ],
 "3":[
-{"frase":"La maglia della nazionale italiana negli sport","corretta":"3"},
+{"frase":"La maglia della nazionale italiana negli sport","corretta":"A"},
 {"frase":"Il colore centrale della bandiera italiana","corretta":"5"}
 ]
 }

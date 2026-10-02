@@ -1,0 +1,27 @@
+{
+  "category": "examples/Ulysses_open_cloze",
+  "question_name": "Ulysses - open cloze",
+  "question_type": "cloze",
+  "cloze_type": "SHORTANSWER",
+  "number_of_statements": "3",
+  "choices": [],
+  "answers": {
+    "1": "{1:SHORTANSWER:=Leopold Bloom~=Mr Bloom~=Mr. Bloom~=Mister Bloom~=Mr Leopold Bloom~=Mr. Leopold Bloom~=Mister Leopold Bloom~=Bloom}",
+    "2": "{1:SHORTANSWER:=Stephen Dedalus~=Dedalus~=S. Dedalus~=Stephen Daedalus~=Daedalus}"
+  },
+  "options": ["bullet_list", "permutations"],
+  "task": "Complete the following sentences by writing the name of the appropriate character",
+  "answer_placeholder": "__PLACEHOLDER",
+
+  "statements": {
+    "1": [
+      "__PLACEHOLDER ate with relish the inner organs of beasts and poultry.",
+      "__PLACEHOLDER works as an advertising canvasser, selling ad space in newspapers across Dublin."
+    ],
+    "2": [
+      "Grieving his mother's recent death, __PLACEHOLDER is haunted by intense guilt for refusing her deathbed wish to pray for her.",
+      "__PLACEHOLDER strolled along Sandymount Strand, tapping his ashplant stick against the wet sand",
+      "__PLACEHOLDER struggles with his role as a schoolteacher"
+    ]
+  } 
+}

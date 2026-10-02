@@ -1,0 +1,28 @@
+{
+  "category": "examples/All_permutations",
+  "question_name": "all permutations",
+  "question_type": "cloze",
+  "cloze_type": "MULTICHOICE_H",
+  "number_of_statements": "4",
+  "choices": [[1, 0, 3]],
+  "answers": {"1": "true", "2": "false"},
+  "if_infinite": {"1": "infinite", "2": "infinite"},
+  "options": ["bullet_list", "permutations"],
+  "task": "Indicate for each of the following sentences whether it is true or false.",
+
+  "statements": {
+    "1": [
+      {"statement": "1-A", "correct": "2"},
+      {"statement": "1-B", "correct": "1"}
+    ],
+    "2": [
+      {"statement": "2-A", "correct": "2"},
+      {"statement": "2-B", "correct": "1"}
+    ],
+    "3": [
+      {"statement": "3-A", "correct": "2"},
+      {"statement": "3-B", "correct": "2"},
+      {"statement": "3-C", "correct": "1"}
+    ]
+  }
+}

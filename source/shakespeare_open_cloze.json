@@ -1,0 +1,34 @@
+{
+  "category": "examples/Shakespeare_openCloze",
+  "question_name": "Shakespeare - open cloze",
+  "question_type": "cloze",
+  "cloze_type": "SHORTANSWER",
+  "number_of_statements": "4",
+  "choices": [],
+  "answers": {
+    "1": "{1:SHORTANSWER:=Polonius}",
+    "2": "{1:SHORTANSWER:=Katherina~=Katharina~=Kate}",
+    "3": "{1:SHORTANSWER:=Scotland}",
+    "4": "{1:SHORTANSWER:=Denmark}",
+    "5": "{1:SHORTANSWER:=Verona}",
+    "6": "{1:SHORTANSWER:=Rome}",
+    "7": "{1:SHORTANSWER:=Richard III~=Richard the Third~=Richard 3~=Richard 3rd}"
+  },
+  "options": ["bullet_list"],
+  "task": "Complete the following statements correctly:",
+  "answer_placeholder": "__PLACEHOLDER",
+
+  "statements": {
+    "1": [
+      {"statement": "In Hamlet, __PLACEHOLDER is the advisor to the king", "correct": "1"},
+      {"statement": "The shrew who will be tamed is named __PLACEHOLDER", "correct": "2"},
+      {"statement": "__PLACEHOLDER wants to give away his kingdom for a horse", "correct": "7"}
+    ],
+    "2": [
+      {"statement": "Romeo and Juliet is set in __PLACEHOLDER", "correct": "5"},
+      {"statement": "Hamlet is set in __PLACEHOLDER", "correct": "4"},
+      {"statement": "Macbeth is set in __PLACEHOLDER", "correct": "3"},
+      {"statement": "Julius Caesar is set in ancient __PLACEHOLDER", "correct": "6"}
+    ]
+  }
+}

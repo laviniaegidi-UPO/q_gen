@@ -1,0 +1,19 @@
+{
+  "category": "examples/chemistry_mcq1",
+  "question_name": "Chemistry - MCQ",
+  "question_type": "mcq",
+  "number_of_statements": "4",
+  "choices": [[1, 1, 2]],
+  "group_fractions": {"2": "100", "3": "0"},
+  "options": ["moodle_shuffle"],
+  "task": "the question is not explicitly here: it is the first statement, for which there are multiple choices",
+  "statements": {
+    "1": [
+      "Which of these chemical elements has six valence electrons?",
+      "Which of these chemical elements together with hydrogen is involved in the combustion reaction that produces only water?",
+      "Which of these chemical elements is necessary in a reduction-oxidation reaction so that oxides are among the products?"
+    ],
+    "2": ["oxygen"],
+    "3": ["carbon", "vanadium", "calcium", "ruthenium", "iodine", "cesium", "uranium"]
+  }
+}

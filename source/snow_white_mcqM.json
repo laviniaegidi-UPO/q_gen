@@ -1,0 +1,40 @@
+{
+  "category": "examples/snow_white_mcqM",
+  "question_name": "Snow White - MCQmulti",
+  "question_type": "mcq",
+  "number_of_statements": "5",
+  "choices": [[1, 1, 0, 3], [1, 0, 2, 0, 2]],
+  "group_fractions": {"2": "100", "3": "50", "5": "-50", "4": "-33,33333"},
+  "options": ["moodle_shuffle", "multiple_answers"],
+  "task": "the question is not explicitly here: it is the first statement, for which there are multiple choices",
+  "statements": {
+    "1": [
+      "Which of these is a friend of Snow White?",
+      "Which of these characters lives in the house where Snow White takes refuge?",
+      "Which of these characters works in a precious stone mine?"
+    ],
+    "2": [
+      "Sneezy",
+      "Sleepy",
+      "Happy",
+      "none of these"
+    ],
+    "3": [
+      "Sneezy",
+      "Sleepy",
+      "Happy"
+    ],
+    "4": [
+      "Rumpelstiltskin",
+      "Aladdin",
+      "Tom Thumb",
+      "Donkey"
+    ],
+    "5": [
+      "Rumpelstiltskin",
+      "Aladdin",
+      "Tom Thumb",
+      "Donkey"
+    ]
+  }
+}

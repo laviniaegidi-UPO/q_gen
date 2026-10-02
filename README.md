@@ -10,11 +10,14 @@ The program is capable of producing questions of the following types:
 * single-choice cloze
 * open cloze
 
-The program is distributed without any warranty, in the hope that it may be useful to others. It is recommended to verify that the produced questions are correct before using them, as there may be errors in the program or the meaning of some options may not be clear.
+The program's interface can be easily translated to any language by customizing the configuration file. A configuration file for usage in English (`config_en.json`) and one for usage in Italian (`config_it.json`) are provided. The program uses by default file `config.json` for its configuration, that in this realease is a copy of the Italian configuration file. Just rename `config_en.json` to `config.json` to switch to English or use the `-c` option (see below).
 
+
+The program is distributed without any warranty, in the hope that it may be useful to others. It is recommended to verify that the produced questions are correct before using them, as there may be errors in the program or the meaning of some options may not be clear.
+It is not complete, it supports question types and cases that have been useful to me.
 It is distributed with a few examples that can help understand the required format for the input files.
 
-A detailed manual is included. This is a brief summary of commands.
+A detailed manual is included, both in Italian and in English. This is just a brief summary of commands.
 
 usage: 
 `q_gen [-h] [-i INPUT_FILE] [-s SOURCE_DIRECTORY] [-o OUT_DIR]

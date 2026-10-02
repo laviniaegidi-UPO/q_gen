@@ -17,11 +17,11 @@ The program is distributed without any warranty, in the hope that it may be usef
 It is not complete, it supports question types and cases that have been useful to me.
 It is distributed with a few examples that can help understand the required format for the input files.
 
-A detailed manual is included, both in Italian and in English. This is just a brief summary of commands.
+A detailed manual is included, both in Italian and in English. This is just a brief summary of the commands.
 
 usage: 
 `q_gen [-h] [-i INPUT_FILE] [-s SOURCE_DIRECTORY] [-o OUT_DIR]
-             [-j JOIN_DIR] [-c CONFIG_FILE] [-v VERIFY_JSON_FILE]`
+             [-j JOIN_DIR] [-c CONFIG_FILE] [-v JSON_FILE_TO_BE_VERIFIED]`
 
 generates collections of questions in XML Moodle format from input JSON files
 
